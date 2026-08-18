@@ -51,9 +51,3 @@ jobs:
         run: |
           cd tests
           pytest test_*.py --doctest-modules --junitxml=junit/test-results.xml --cov=com --cov-report=xml --cov-report=html
-
-      - name: Upload CIntent Artifacts
-        uses: actions/upload-artifact@v4
-        if: always()
-          name: ${{ env.CINTENT_ARTIFACT_NAME }}
-          path: ${{ env.CINTENT_LOGS }}
