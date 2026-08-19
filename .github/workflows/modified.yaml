@@ -3,13 +3,11 @@
 
 name: Python package
 
-# CINTENT >> MANUAL TRIGGER
-# on:
-#   push:
-#     branches: [ "main" ]
-#   pull_request:
-#     branches: [ "main" ]
-on: [repository_dispatch, workflow_dispatch]
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
 
 jobs:
   build:
@@ -19,23 +17,19 @@ jobs:
       fail-fast: false
       matrix:
         python-version: [ "3.8" ]
-        os: [ ubuntu-latest ]
+        os: [ ubuntu-22.04 ]
 
     steps:
       - uses: actions/checkout@v3
-  
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
-      
-
       - name: Free up disk space
         run: |
           sudo apt-get clean
           sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc
           df -h
-
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
@@ -46,7 +40,6 @@ jobs:
           
           sudo apt install -qqy lsb-release gnupg2 curl
           sudo apt-get update
-          
       - name: Test with pytest
         run: |
           cd tests
