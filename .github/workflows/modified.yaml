@@ -3,12 +3,13 @@
 
 name: Python package
 
-on:
-  workflow_dispatch: 
-  push:
-    branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
+# CINTENT >> MANUAL TRIGGER
+# on:
+#   push:
+#     branches: [ "main" ]
+#   pull_request:
+#     branches: [ "main" ]
+on: [repository_dispatch, workflow_dispatch]
 
 jobs:
   build:
@@ -18,19 +19,27 @@ jobs:
       fail-fast: false
       matrix:
         python-version: [ "3.8" ]
-        os: [ ubuntu-22.04 ]
+        os: [ ubuntu-latest ]
 
     steps:
       - uses: actions/checkout@v3
+  
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
+      
+      # # CINTENT >> INSERT_CINTENT
+      # - uses: JavidDitty/setup-cintent@main
+      #   with:
+      #     profiler: "setprofile"
+
       - name: Free up disk space
         run: |
           sudo apt-get clean
           sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc
           df -h
+
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
@@ -41,7 +50,11 @@ jobs:
           
           sudo apt install -qqy lsb-release gnupg2 curl
           sudo apt-get update
+          
       - name: Test with pytest
         run: |
           cd tests
           pytest test_*.py --doctest-modules --junitxml=junit/test-results.xml --cov=com --cov-report=xml --cov-report=html
+        with:
+          name: ${{ env.CINTENT_ARTIFACT_NAME }}
+          path: ${{ env.CINTENT_LOGS }}
