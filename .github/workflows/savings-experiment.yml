@@ -52,6 +52,7 @@ jobs:
           echo "packages: $(pip freeze | wc -l)"
           echo "fingerprint: $(pip freeze | grep -viE '^(pip|rofunc)[= @]' | sort | sha256sum)"
           pip freeze | grep -iE '^(numpy|torch|gym|gymnasium|transformers|setuptools)=='
+          echo "normalized fingerprint: $(pip freeze | grep -viE '^(pip|rofunc)[= @]' | sed -E 's/#sha256=.*//' | python -c "import sys,re; print(''.join(sorted(re.sub(r'[-_.]+','-',l.split('==')[0].split(' @')[0]).lower()+l[len(re.split(r'==| @',l)[0]):] for l in sys.stdin)))" | sha256sum)"
           echo "=== full freeze"
           pip freeze | grep -viE '^(pip|rofunc)[= @]' | sort | sed 's/^/FREEZE /'
       - name: Test with pytest
